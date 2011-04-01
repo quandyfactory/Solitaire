@@ -1,0 +1,98 @@
+html { margin: 0; padding: 0; }
+body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
+
+
+#board { 
+    width: 490px; height: 450px; 
+    border: 2px solid #333; background: LimeGreen; 
+    position: relative; 
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+}
+
+#about_pane, #instructions_pane {
+	position: absolute; top: 20px; left: 20px; width: 360px; height: 320px;
+	border: 5px solid white; background: #efffef;
+	text-align: left;
+	font-size: 70%;
+	padding: 40px;
+	z-index: 1000001;
+	-moz-box-shadow: 0 0 4px #ccc;
+	-webkit-box-shadow: 0 0 4px #ccc;
+	box-shadow: 0 0 4px #ccc;
+	-moz-box-shadow:inset 0 0 20px #333;
+	-webkit-box-shadow:inset 0 0 20px #333;
+	box-shadow:inset 0 0 20px #333;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+}
+
+#about_pane h2, #instructions_pane h2 { text-align: center; margin-top: -1em; padding-top: -1em; }
+
+#instructions_pane ul { margin: 0; padding: 0; list-style-position: outside }
+#instructions_pane li { margin: 0; padding: 0; }
+
+#score {
+	position: absolute; right: 0; bottom: 0; padding: 0 2px; 
+}
+
+#tools {
+	position: absolute; bottom: 0; left: 0; width: 100%;
+	text-align: center;
+}
+
+#redeal {
+}
+
+#restart {
+}
+
+#notification {
+	width: 488px; 
+	border: 2px solid #333; border-top: 0; border: 0;
+	color: #454545; background: white;
+	font-size: .8em; padding: 3px;
+}
+
+.card { position: absolute;
+	width: 72px; height: 112px; 
+	width: 54px; height: 84px;
+	
+	border: 2px solid #333;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+	background: url('../img/tile.png') top left repeat;
+	padding: 2px;
+	text-align: center; font-size: 200%;
+}
+
+.ui-draggable-dragging { border: 2px solid #33f; }
+
+.bed { position: absolute;
+	width: 60px; height: 100px; 
+	width: 54px; height: 84px; 
+	
+	border: 2px solid #333;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+	background: #54ef54;
+	padding: 2px;
+	text-align: center;
+}
+
+#loading { 
+	position: absolute; top: 290px; left: 350px; border: 3px solid #333; padding: 8px; 
+	text-align: center; font-size: 130%; z-index: 100; background: lightyellow;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -khtml-border-radius: 8px;
+    border-radius: 8px;
+}

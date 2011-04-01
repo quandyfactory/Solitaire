@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Solitaire</title>
+<style type="text/css">@import url('css/style.css');</style>
+</head>
+<body>
+<div id="board"></div>
+<div id="notification">Good luck!</div>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.11.custom.min.js"></script>
+<script type="text/javascript" src="js/jquery.noisy.min.js"></script>
+<script type="text/javascript" src="js/game.js"></script>
+</body>
+</html>
