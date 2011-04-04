@@ -1,8 +1,8 @@
 // global variables
 var __description__ = 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.';
-var __version__ = 0.1;
+var __version__ = 0.11;
 var __author__ = 'Ryan McGreal';
-var __releasedate__ = '2011-04-01';
+var __releasedate__ = '2011-04-04';
 var __homepage__ = 'http://quandyfactory.com/projects/74/solitaire';
 var __copyright__ = '(C) 2011 by Ryan McGreal';
 var __licence__ = 'GNU General Public Licence, Version 2';
@@ -21,7 +21,7 @@ var vals = 'A 2 3 4 5 6 7 8 9 10 J Q K'.split(' ');
 var zIndex = 51; // initialize zIndex so we can always put cards on top of each other
 var score = 0; // increment by 1 each time you put a card on the foundation, decrement by 1 when you remove a card
 
-var debugMode = false; // set to false to disable console.log
+var debugMode = true; // set to true to send details to console.log
 
 // create and shuffle a new deck
 var deck = makeDeck(); 
@@ -168,8 +168,9 @@ function restart() {
 function addFoundation() {
 	// adds the foundation beds, where the cards end up sorted by suit and ascending from Ace
 	for (var i=0; i<4; i++) {
-		var thiswidth = (width*i) + margin;
-		$('#board').append($('<div class="bed" title="Foundation" id="foundation_' + i + '" style="top: ' + margin + 'px; right: ' + thiswidth + 'px;"></div>'));
+		var distFromLeft = 204;
+		var thiswidth = distFromLeft + (width*i) + margin;
+		$('#board').append($('<div class="bed" title="Foundation" id="foundation_' + i + '" style="top: ' + margin + 'px; left: ' + thiswidth + 'px;"></div>'));
 		var thisPos = $('#foundation_'+i).position();
 		log('foundation_'+i+' - ' + thisPos.left + ', ' + thisPos.top);
 	}
@@ -180,7 +181,7 @@ function addPlayingArea() {
 	for (var i=0; i<7; i++) {
 		var thiswidth = (width*i) + margin;
 		var thisheight = height + margin;
-		$('#board').append($('<div class="bed" title="Playing Area" id="play_' + i + '" style="top: ' + thisheight + 'px; right: ' + thiswidth + 'px;"></div>'));
+		$('#board').append($('<div class="bed" title="Playing Area" id="play_' + i + '" style="top: ' + thisheight + 'px; left: ' + thiswidth + 'px;"></div>'));
 	}
 }
 
@@ -388,7 +389,7 @@ function makeDblClick(id) {
 			var thisLeft = [224, 292, 360, 428];
 			for (i=0;i<thisLeft.length;i++) {
 				var elem = document.elementFromPoint(thisLeft[i], thisTop);
-				console.log(elem.id.substring(0,10));
+				console.log('foundation id: ' + elem.id + ', substring: ' + elem.id.substring(0,10));
 				if (elem.id.substring(0,10) == 'foundation' && deck[thisIdNum].val == 'A') {
 					log('in makeDblClick(); the '+deck[thisIdNum].val+' of '+deck[thisIdNum].suit+' moves to '+elem.id+'.');
 					moveFoundation('ace', this.id, elem.id);
@@ -545,9 +546,9 @@ function moveFoundation(which, card_id, elem_id) {
 	if (which == 'ace') {
 		var deckId = parseInt(card_id.replace('card-', ''));
 		var this_card = deck[deckId];
-
 		this_card.posX = $('#'+elem_id).css('left');
 		this_card.posY = $('#'+elem_id).css('top');
+		log('in moveFoundation(); deckId='+deckId+', card_id='+card_id+', elem_id='+elem_id+', deckId='+ deckId + ', this_card.posX='+this_card.posX+', this_card.posY='+ this_card.posY);
 		this_card.location = 'foundation';
 		this_card.parentId = -1;
 		$('#'+card_id)
