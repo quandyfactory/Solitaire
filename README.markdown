@@ -1,6 +1,6 @@
 ## Solitaire README
 
-This is a version of solitaire I hacked up using HTML, CSS, javascript with [jQuery](http://jquery.com), jQUery-UI](http://jqueryui.com/) draggable, the [Noisy](https://github.com/DanielRapp/Noisy) jQuery plugin, and only one small image. It's pretty nasty, but I wanted to get a feel for the draggable jquery-UI functionality. 
+This is a version of solitaire I hacked up using HTML, CSS, javascript with [jQuery](http://jquery.com), [jQUery-UI](http://jqueryui.com/) draggable, the [Noisy](https://github.com/DanielRapp/Noisy) jQuery plugin, and only one small image. It's pretty nasty, but I wanted to get a feel for the draggable jquery-UI functionality. 
 
 ### Demo
 
