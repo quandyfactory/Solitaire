@@ -1,7 +1,6 @@
 html { margin: 0; padding: 0; }
 body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
 
-
 #board { 
     width: 490px; height: 450px; 
     border: 2px solid #333; background: LimeGreen; 
@@ -31,10 +30,16 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
     border-radius: 8px;
 }
 
-#about_pane h2, #instructions_pane h2 { text-align: center; margin-top: -1em; padding-top: -1em; }
+#about_pane h2, #instructions_pane h2 { 
+    text-align: center; margin-top: -1em; padding-top: -1em; 
+}
 
-#instructions_pane ul { margin: 0; padding: 0; list-style-position: outside }
-#instructions_pane li { margin: 0; padding: 0; }
+#instructions_pane ul { 
+    margin: 0; padding: 0; list-style-position: outside 
+}
+#instructions_pane li { 
+    margin: 0; padding: 0; 
+}
 
 #score {
 	position: absolute; right: 0; bottom: 0; padding: 0 2px; 
@@ -43,12 +48,6 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
 #tools {
 	position: absolute; bottom: 0; left: 0; width: 100%;
 	text-align: center;
-}
-
-#redeal {
-}
-
-#restart {
 }
 
 #notification {
@@ -60,7 +59,6 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
 
 .card { position: absolute;
 	width: 54px; height: 84px;
-	
 	border: 2px solid #333;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
@@ -71,11 +69,12 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
 	text-align: center; font-size: 200%;
 }
 
-.ui-draggable-dragging { border: 2px solid #33f; }
+.ui-draggable-dragging { 
+    border: 2px solid #33f; 
+}
 
 .bed { position: absolute;
 	width: 54px; height: 84px; 
-	
 	border: 2px solid #333;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
