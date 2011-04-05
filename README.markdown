@@ -19,10 +19,14 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.11
+* Version: 0.12
 * Release Date: 2011-04-04
 
 ### Revision History
+
+* Version: 0.12
+    * Release Date: 2011-04-04
+    * Changes: Fixed bug in makeDblClick(), added missing restart function on completion
 
 * Version: 0.11
     * Release Date: 2011-04-04

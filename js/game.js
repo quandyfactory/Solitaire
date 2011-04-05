@@ -1,6 +1,6 @@
 // global variables
 var __description__ = 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.';
-var __version__ = 0.11;
+var __version__ = 0.12;
 var __author__ = 'Ryan McGreal';
 var __releasedate__ = '2011-04-04';
 var __homepage__ = 'http://quandyfactory.com/projects/74/solitaire';
@@ -145,6 +145,9 @@ function updateScore() {
 	$('#score').html('Score: '+score);
 	if (score == 52) {
 		var answer = confirm('You won the game! Click OK to deal a new hand.');
+	}
+	if (answer) {
+	    redeal();
 	}
 	log('score='+ score);
 }
@@ -397,7 +400,8 @@ function makeDblClick(id) {
 					break;
 				} else { // there's a card on the foundation
 					var thisElemNum = parseInt(elem.id.replace('card-',''));
-					if (deck[thisIdNum].suit == deck[thisElemNum].suit && deck[thisIdNum].valNum == deck[thisElemNum].valNum+1) {
+					log('thisIdNum='+thisIdNum+', thisElemNum='+thisElemNum);
+					if (thisElemNum && deck[thisIdNum].suit == deck[thisElemNum].suit && deck[thisIdNum].valNum == deck[thisElemNum].valNum+1) {
 						log('in makeDblClick(); the '+deck[thisIdNum].val+' of '+deck[thisIdNum].suit+' moves to '+elem.id+'.');
 						moveFoundation('', this.id, elem.id);
 						break;
