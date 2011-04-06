@@ -87,6 +87,7 @@ function addTools() {
 
 function deepCopy(obj) {
     // stupid javascript has no easy way to do a deep copy of an object
+    // function source: http://snipplr.com/view/15407/deep-copy-an-array-or-object/
     if (Object.prototype.toString.call(obj) === '[object Array]') {
         var out = [], i = 0, len = obj.length;
         for ( ; i < len; i++ ) {
