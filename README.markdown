@@ -19,10 +19,14 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.13
-* Release Date: 2011-04-05
+* Version: 0.14
+* Release Date: 2011-04-06
 
 ### Revision History
+
+* Version: 0.14
+    * Release Date: 2011-04-06
+    * Changes: Implemented unlimited undo back to the start of a game (and learned about deep copying of objects in javascript)
 
 * Version: 0.13
     * Release Date: 2011-04-05

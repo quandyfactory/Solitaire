@@ -11,7 +11,7 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
     border-radius: 8px;
 }
 
-#about_pane, #instructions_pane {
+#about_pane, #rules_pane {
 	position: absolute; top: 20px; left: 20px; width: 360px; height: 320px;
 	border: 5px solid white; background: #efffef;
 	text-align: left;
@@ -30,14 +30,14 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
     border-radius: 8px;
 }
 
-#about_pane h2, #instructions_pane h2 { 
+#about_pane h2, #rules_pane h2 { 
     text-align: center; margin-top: -1em; padding-top: -1em; 
 }
 
-#instructions_pane ul { 
+#rules_pane ul { 
     margin: 0; padding: 0; list-style-position: outside 
 }
-#instructions_pane li { 
+#rules_pane li { 
     margin: 0; padding: 0; 
 }
 
@@ -47,7 +47,7 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
 
 #tools {
 	position: absolute; bottom: 0; left: 0; width: 100%;
-	text-align: center;
+	text-align: left;
 }
 
 #notification {

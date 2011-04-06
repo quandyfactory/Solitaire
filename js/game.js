@@ -1,9 +1,9 @@
 // global variables
 var _sol = {
     __description__: 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.',
-    __version__: 0.13,
+    __version__: 0.14,
     __author__: 'Ryan McGreal',
-    __releasedate__: '2011-04-05',
+    __releasedate__: '2011-04-06',
     __homepage__: 'http://quandyfactory.com/projects/74/solitaire',
     __copyright__: '(C) 2011 by Ryan McGreal',
     __licence__: 'GNU General Public Licence, Version 2',
@@ -72,22 +72,110 @@ function startGame(deck) {
 function addTools() {
 	// adds restart and redeal buttons
 	$('#board').append($('<div id="tools"></div>'));
+	$('#tools').append($('<button id="undo" title="Undo the last move">&lArr; Undo</button>'));
 	$('#tools').append($('<button id="restart" title="Start this game over again">Restart</button>'));
 	$('#tools').append($('<button id="redeal" title="Shuffle the deck and start a new game">New Game</button>'));
-	$('#tools').append($('<button id="instructions" title="Instructions on how to play the game">Instructions</button>'));
+	$('#tools').append($('<button id="rules" title="Instructions on how to play the game">Rules</button>'));
 	$('#tools').append($('<button id="about" title="About this game">About</button>'));
+	$('#undo').click(undo);
 	$('#restart').click(restart); 
 	$('#redeal').click(redeal); 
 	$('#about').click(about);
-	$('#instructions').click(instructions);
+	$('#rules').click(rules);
 }
 
-function instructions() {
+
+function deepCopy(obj) {
+    // stupid javascript has no easy way to do a deep copy of an object
+    if (Object.prototype.toString.call(obj) === '[object Array]') {
+        var out = [], i = 0, len = obj.length;
+        for ( ; i < len; i++ ) {
+            out[i] = arguments.callee(obj[i]);
+        }
+        return out;
+    }
+    if (typeof obj === 'object') {
+        var out = {}, i;
+        for ( i in obj ) {
+            out[i] = arguments.callee(obj[i]);
+        }
+        return out;
+    }
+    return obj;
+}
+
+
+function addHistory(deck) {
+    // adds a snapshot of the deck to the _sol.history array
+    var myCopy = deepCopy(deck);
+    _sol.history.push(myCopy);
+    log('pushed deck to history: ');
+    log(deck);
+}
+
+function undo() {
+    // pulls the previous deck state out of _sol.history and resets the cards to that state
+    
+    // 0. Check length of history
+    if (_sol.history.length == 1) {
+        notify('You are at the first move.');
+        return;
+    }
+    
+    // 1. Blast the current deck out of history
+    log('Deck: ');
+    log(_sol.deck);
+    
+    log('History: ');
+    for (var i=0; i<_sol.history.length; i++) {
+        log(_sol.history[i]);
+    }
+    
+    _sol.history.pop();
+    log('History after pop: ');
+    for (var i=0; i<_sol.history.length; i++) {
+        log(_sol.history[i]);
+    }
+
+    // 2. Make the deck equal the previous history
+    var thisDeck = _sol.history[_sol.history.length-1];
+    
+    // 3. Reposition the cards in their previous locations
+    for (var c=0; c<thisDeck.length; c++) {
+        var card = thisDeck[c];
+        log(printObject(card));
+        $('#'+card.id)
+            .css('left', card.posX)
+            .css('top', card.posY)
+            .css('zIndex', card.zIndex)
+            .css('color', card.colour);
+        if (card.face == 'up') {
+            $('#'+card.id)
+    			.css('background', 'white')
+    			.html(card.val + '&' + card.suit + ';');
+        } else {
+            $('#'+card.id)
+                .html('')
+                .css('background', '')
+                .css('background-image', 'url(img/tile.png');
+        }
+    }
+    log('thisDeck: ');
+    log(thisDeck);
+    
+    _sol.deck = thisDeck;
+    
+    log('_sol.deck: ');
+    log(_sol.deck);
+    notify('You undid your last move.');
+}
+
+function rules() {
 	// adds an overlay with instructions on how to play the game
 	$('#about_pane').remove(); // just in case
-	$('#instructions_pane').remove(); // just in case
+	$('#rules_pane').remove(); // just in case
 	var output = [];
-	output.push('<div id="instructions_pane" title="Click on this pane to close it.">');
+	output.push('<div id="rules_pane" title="Click on this pane to close it.">');
 	output.push('<h2>Instructions</h2>');
 	output.push('<ul>');
 	output.push('<li>The object is to move all the cards face-up into the <strong>foundation</strong> (the four empty beds on the top right of the board) in ascending order by suit.</li>');
@@ -106,29 +194,29 @@ function instructions() {
 	output.push('<li>If you want to shuffle and redeal the cards, click the "New Game" button.</li>');
 	output.push('</ul>');
 	$('body').append($(output.join('\n')));
-	$('#instructions_pane')
+	$('#rules_pane')
 		.mouseenter(function() {
-			$('#instructions_pane').css('cursor', 'pointer');
+			$('#rules_pane').css('cursor', 'pointer');
 		})
 		.click(function() {
-		$('#instructions_pane').remove();
+		$('#rules_pane').remove();
 	});
 }	
 	
 function about() {
 	// adds an overlay explaining about the game
 	$('#about_pane').remove(); // just in case
-	$('#instructions_pane').remove(); // just in case
+	$('#rules_pane').remove(); // just in case
 	var output = [];
 	output.push('<div id="about_pane" title="Click on this pane to close it.">');
 	output.push('<h2>About this Game</h2>');
-	output.push('<p>' + sol.__description__.replace('\n', '<br>') + '</p>');
+	output.push('<p>' + _sol.__description__.replace('\n', '<br>') + '</p>');
 	output.push('<ul>');
-	output.push('<li>Author: ' + sol.__author__ + '</li>');
-	output.push('<li>Copyright: ' + sol.__copyright__ + '</li>');
-	output.push('<li><a target="_blank" href="' + sol.__licence_url__ + '">' + sol.__licence__ + '</a></li>');
-	output.push('<li>Version: ' + sol.__version__ + ', released ' + sol.__releasedate__ + '</li>');
-	output.push('<li>Homepage: <a target="_blank" href="' + sol.__homepage__ + '">' + sol.__homepage__ + '</a></li>');
+	output.push('<li>Author: ' + _sol.__author__ + '</li>');
+	output.push('<li>Copyright: ' + _sol.__copyright__ + '</li>');
+	output.push('<li><a target="_blank" href="' + _sol.__licence_url__ + '">' + _sol.__licence__ + '</a></li>');
+	output.push('<li>Version: ' + _sol.__version__ + ', released ' + _sol.__releasedate__ + '</li>');
+	output.push('<li>Homepage: <a target="_blank" href="' + _sol.__homepage__ + '">' + _sol.__homepage__ + '</a></li>');
 	output.push('</ul>');
 	output.push('</div>');
 	
@@ -171,7 +259,8 @@ function redeal() {
 
 function restart() {
     // redeals the currently shuffled deck
-    _sol.deck = startGame(_sol.deck);
+    _sol.history = []; // reset history
+    _sol.deck = startGame(_sol.deck); // deal the cards
     playGame(_sol.deck);
     notify('You restarted this game.');
 }
@@ -288,6 +377,7 @@ function loadCards(deck) {
 	return deck
 }
 
+
 function deal(deck) {
 	// deals a deck onto the playing area
 	log(' ');
@@ -323,6 +413,7 @@ function deal(deck) {
 		}
 		cardIndex -= mainLoop-1;
 	}
+	addHistory(deck); // add this snapshot to history
 	return deck;	
 }
 
@@ -485,15 +576,13 @@ function dragStop() {
 		if (elem_id.substring(0,10) == 'foundation' // the bed needs to be a foundation bed
 			&& this_card.val == 'A' // the card needs to be an ace, duh
 			) {
-			
 			moveFoundation('ace', this_card.id, elem_id);
-		
+
 		// trying to put something other than an ace on the empty foundation
 		} else if ( 
 				elem_id.substring(0,10) == 'foundation' 
 			) {
 			$(this).css('top', this_card.posY).css('left', this_card.posX);							
-
 			notify('You cannot place the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' directly on the foundation.');
 
         // trying to put a king on a play bed
@@ -501,7 +590,6 @@ function dragStop() {
 				elem_id.substring(0,5) == 'play_' // the bed has to be a play bed
 				&& this_card.val == 'K' // the card needs to be a king
 			) {
-
 			this_card.posX = parseInt($('#' + elem_id).css('left').replace('px', ''));
 			this_card.posY = parseInt($('#' + elem_id).css('top').replace('px', ''));
 			if (this_card.location == 'foundation') { // don't forget to decrement score if moving a king off the foundation
@@ -511,8 +599,8 @@ function dragStop() {
 			this_card.location = 'play';
 			log(printObject(this_card));
 			$(this).css('left', this_card.posX).css('top', this_card.posY);
-
 			notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into an empty playing area.');
+			addHistory(_sol.deck);
 			
 			// need to check whether any cards are on the king, i.e. another card has the king's id as a parentId
 			for (var check=0; check<_sol.deck.length; check++ ) {
@@ -573,6 +661,7 @@ function moveFoundation(which, card_id, elem_id) {
 		log('score=' +  score);
 		updateScore();
 		notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into the foundation.');
+		addHistory(_sol.deck);
 		return;
 
 	} else {
@@ -603,6 +692,7 @@ function moveFoundation(which, card_id, elem_id) {
 		log('score=' +  score);
 		updateScore();
 		notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into the foundation.');
+		addHistory(_sol.deck);
 	}
 }
 
@@ -643,6 +733,7 @@ function putCardOnCard(this_card_id, under_card_id) {
         // gettin' all recursive in yo biznitch
         putCardOnCard(this_card.childId, this_card.id)
     }
+    addHistory(_sol.deck);
 
 }
 
@@ -676,6 +767,7 @@ function turnStock() {
 	$(this).unbind('click');
 	
 	notify('You moved the ' + displayVal(_sol.deck[thisId].val) + ' of ' + displaySuit(_sol.deck[thisId].suit) + ' from the stock to the waste.');
+	addHistory(_sol.deck);
 }
 
 function flipCard() {
@@ -698,6 +790,7 @@ function flipCard() {
     } else {
         notify('You cannot flip a card that is covered by another card.');
     }
+    addHistory(_sol.deck);
 }
 
 function notify(message) {
@@ -738,6 +831,7 @@ function restoreStock() {
     } else {
         notify('You restored the cards from the waste to the stock.');
     }
+    addHistory(_sol.deck);
 }
 
 function displayVal(val) {
