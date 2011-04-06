@@ -26,7 +26,7 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 * Version: 0.13
     * Release Date: 2011-04-05
-    * Changes: Added namespace for global variables
+    * Changes: Added namespace for global variables, fixed bug in about() and instructions()
 
 * Version: 0.12
     * Release Date: 2011-04-04
