@@ -19,10 +19,14 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.12
-* Release Date: 2011-04-04
+* Version: 0.13
+* Release Date: 2011-04-05
 
 ### Revision History
+
+* Version: 0.13
+    * Release Date: 2011-04-05
+    * Changes: Added namespace for global variables
 
 * Version: 0.12
     * Release Date: 2011-04-04

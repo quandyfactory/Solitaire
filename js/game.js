@@ -1,31 +1,37 @@
 // global variables
-var __description__ = 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.';
-var __version__ = 0.12;
-var __author__ = 'Ryan McGreal';
-var __releasedate__ = '2011-04-04';
-var __homepage__ = 'http://quandyfactory.com/projects/74/solitaire';
-var __copyright__ = '(C) 2011 by Ryan McGreal';
-var __licence__ = 'GNU General Public Licence, Version 2';
-var __licence_url__ = 'http://www.gnu.org/licenses/old-licenses/gpl-2.0.html';
+var _sol = {
+    __description__: 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.',
+    __version__: 0.13,
+    __author__: 'Ryan McGreal',
+    __releasedate__: '2011-04-05',
+    __homepage__: 'http://quandyfactory.com/projects/74/solitaire',
+    __copyright__: '(C) 2011 by Ryan McGreal',
+    __licence__: 'GNU General Public Licence, Version 2',
+    __licence_url__: 'http://www.gnu.org/licenses/old-licenses/gpl-2.0.html',
 
-var margin = 10; // normal space between objects on the board
-var padding = 2; // normal padding inside an object
-var width = 60 + (padding * 2) + margin; // width of a card bed + margin
-var width = 54 + (padding * 2) + margin; // width of a card bed + margin
+    margin: 10, // normal space between objects on the board
+    padding: 2, // normal padding inside an object
+    suits: 'hearts diams clubs spades'.split(' '),
+    vals: 'A 2 3 4 5 6 7 8 9 10 J Q K'.split(' '),
+    zIndex: 51, // initialize zIndex so we can always put cards on top of each other
+    score: 0, // increment by 1 each time you put a card on the foundation, decrement by 1 when you remove a card
+    debugMode: false, // set to true to send details to console.log
+    deck: [],
+    history: []
+};
 
-var height = 100 + (padding * 2) + margin; // height of a card bed + margin
-var height = 84 + (padding * 2) + margin; // height of a card bed + margin
+_sol['width'] = 54 + (_sol.padding * 2) + _sol.margin; // width of a card bed + margin
+_sol['height'] = 84 + (_sol.padding * 2) + _sol.margin; // height of a card bed + margin
 
-var suits = 'hearts diams clubs spades'.split(' ');
-var vals = 'A 2 3 4 5 6 7 8 9 10 J Q K'.split(' ');
-var zIndex = 51; // initialize zIndex so we can always put cards on top of each other
-var score = 0; // increment by 1 each time you put a card on the foundation, decrement by 1 when you remove a card
-
-var debugMode = false; // set to true to send details to console.log
+for (val in _sol) {
+    if (_sol.hasOwnProperty(val)) {
+        log('_sol.'+val+'='+_sol[val]);
+    }
+}
 
 // create and shuffle a new deck
-var deck = makeDeck(); 
-deck = shuffle(deck); 
+_sol.deck = makeDeck(); 
+_sol.deck = shuffle(_sol.deck); 
 
 $(document).ready(function(){
  	$('#board').noisy({
@@ -34,9 +40,9 @@ $(document).ready(function(){
 		opacity: 0.1,
 		monochrome: false
 	});
-	deck = startGame(deck);
+	_sol.deck = startGame(_sol.deck);
 	
-	playGame(deck);
+	_sol.deck = playGame(_sol.deck);
 	
 });
 
@@ -55,7 +61,7 @@ function startGame(deck) {
 	addStockWaste();
 	
 	// load the cards into the stock
-	loadCards(deck);
+	deck = loadCards(deck);
 	
 	// deal the cards onto the playing area
 	deck = deal(deck);
@@ -79,6 +85,7 @@ function addTools() {
 function instructions() {
 	// adds an overlay with instructions on how to play the game
 	$('#about_pane').remove(); // just in case
+	$('#instructions_pane').remove(); // just in case
 	var output = [];
 	output.push('<div id="instructions_pane" title="Click on this pane to close it.">');
 	output.push('<h2>Instructions</h2>');
@@ -110,17 +117,18 @@ function instructions() {
 	
 function about() {
 	// adds an overlay explaining about the game
+	$('#about_pane').remove(); // just in case
 	$('#instructions_pane').remove(); // just in case
 	var output = [];
 	output.push('<div id="about_pane" title="Click on this pane to close it.">');
 	output.push('<h2>About this Game</h2>');
-	output.push('<p>'+__description__.replace('\n', '<br>')+'</p>');
+	output.push('<p>' + sol.__description__.replace('\n', '<br>') + '</p>');
 	output.push('<ul>');
-	output.push('<li>Author: '+__author__+'</li>');
-	output.push('<li>Copyright: '+__copyright__+'</li>');
-	output.push('<li><a target="_blank" href="'+__licence_url__+'">'+__licence__+'</a></li>');
-	output.push('<li>Version: '+__version__+', released '+__releasedate__+'</li>');
-	output.push('<li>Homepage: <a target="_blank" href="'+__homepage__+'">'+__homepage__+'</a></li>');
+	output.push('<li>Author: ' + sol.__author__ + '</li>');
+	output.push('<li>Copyright: ' + sol.__copyright__ + '</li>');
+	output.push('<li><a target="_blank" href="' + sol.__licence_url__ + '">' + sol.__licence__ + '</a></li>');
+	output.push('<li>Version: ' + sol.__version__ + ', released ' + sol.__releasedate__ + '</li>');
+	output.push('<li>Homepage: <a target="_blank" href="' + sol.__homepage__ + '">' + sol.__homepage__ + '</a></li>');
 	output.push('</ul>');
 	output.push('</div>');
 	
@@ -137,67 +145,67 @@ function about() {
 function addScore() {
 	// adds a score notification to the board
 	score = 0; // reset score
-	$('#board').append($('<div id="score">Score: '+score+'</div>'));
+	$('#board').append($('<div id="score">Score: ' + score + '</div>'));
 }
 
 function updateScore() {
 	// updates the score notification
-	$('#score').html('Score: '+score);
+	$('#score').html('Score: ' + score);
 	if (score == 52) {
 		var answer = confirm('You won the game! Click OK to deal a new hand.');
 	}
 	if (answer) {
 	    redeal();
 	}
-	log('score='+ score);
+	log('score=' +  score);
 }
 
 function redeal() {
     // reshuffles the deck and deals a new hand
-    deck = makeDeck();
-    deck = shuffle(deck);
-    deck = startGame(deck);
-    playGame(deck);
+    _sol.deck = makeDeck();
+    _sol.deck = shuffle(_sol.deck);
+    _sol.deck = startGame(_sol.deck);
+    playGame(_sol.deck);
     notify('You started a new game.');
 }
 
 function restart() {
     // redeals the currently shuffled deck
-    deck = startGame(deck);
-    playGame(deck);
+    _sol.deck = startGame(_sol.deck);
+    playGame(_sol.deck);
     notify('You restarted this game.');
 }
 
 function addFoundation() {
 	// adds the foundation beds, where the cards end up sorted by suit and ascending from Ace
-	for (var i=0; i<4; i++) {
+	for (var i = 0; i < 4; i++ ) {
 		var distFromLeft = 204;
-		var thiswidth = distFromLeft + (width*i) + margin;
-		$('#board').append($('<div class="bed" title="Foundation" id="foundation_' + i + '" style="top: ' + margin + 'px; left: ' + thiswidth + 'px;"></div>'));
-		var thisPos = $('#foundation_'+i).position();
-		log('foundation_'+i+' - ' + thisPos.left + ', ' + thisPos.top);
+		var thisWidth = distFromLeft + (_sol.width*i) + _sol.margin;
+		$('#board').append($('<div class="bed" title="Foundation" id="foundation_' + i + '" style="top: ' + _sol.margin + 'px; left: ' + thisWidth + 'px;"></div>'));
+		var thisPos = $('#foundation_' + i).position();
+		log('in addFoundation(); foundation_' + i + ' - ' + thisPos.left + ', ' + thisPos.top);
 	}
 }
 
 function addPlayingArea() {
 	// add the playing area beds, where the cards are dealt
-	for (var i=0; i<7; i++) {
-		var thiswidth = (width*i) + margin;
-		var thisheight = height + margin;
-		$('#board').append($('<div class="bed" title="Playing Area" id="play_' + i + '" style="top: ' + thisheight + 'px; left: ' + thiswidth + 'px;"></div>'));
+	for (var i=0; i<7; i++ ) {
+		var thisWidth = (_sol.width*i) + _sol.margin;
+		var thisheight = _sol.height + _sol.margin;
+		$('#board').append($('<div class="bed" title="Playing Area" id="play_' + i + '" style="top: ' + thisheight + 'px; left: ' + thisWidth + 'px;"></div>'));
 	}
 }
 
 function addStockWaste() {
 	// add the stock and waste beds
-	for (var i=0; i<2; i++) {
-		var thiswidth = (width*i) + margin;
+	for (var i=0; i<2; i++ ) {
+		var thisWidth = (_sol.width*i) + _sol.margin;
 		if (i == 0) {
 			var thisId = 'stock';
 		} else {
 			var thisId = 'waste';
 		}
-		$('#board').append($('<div class="bed" title="' + pcase(thisId) + '" id="' + thisId + '" style="top: ' + margin + 'px; left: ' + thiswidth + 'px;"></div>'));
+		$('#board').append($('<div class="bed" title="' + pcase(thisId) + '" id="' + thisId + '" style="top: ' + _sol.margin + 'px; left: ' + thisWidth + 'px;"></div>'));
 	}
 }
 
@@ -205,17 +213,17 @@ function makeDeck() {
 	// creates and returns a deck of cards
 	var deck = [];
 	var id = 0;
-	for (var s=0; s<suits.length; s++) {
-		for (var v=0; v<vals.length; v++) {
+	for (var s=0; s < _sol.suits.length; s++ ) {
+		for (var v=0; v < _sol.vals.length; v++ ) {
 			var colour = 'red';
-			if ((suits[s] === 'clubs') || (suits[s] === 'spades')) {
+			if ((_sol.suits[s] === 'clubs') || (_sol.suits[s] === 'spades')) {
 				colour = 'black';
 			}
 			deck.push({ 
-				'suit': suits[s], 
+				'suit': _sol.suits[s], 
 				'suitNum': s,
-				'val': vals[v], 
-				'valNum': v+1, // for comparing values on a drop
+				'val': _sol.vals[v], 
+				'valNum': v + 1, // for comparing values on a drop
 				'colour': colour, 
 				'face': 'down',
 				'zIndex': 0, // initialize - wil set later
@@ -228,7 +236,7 @@ function makeDeck() {
 				'childId': -1 // used for cards placed on other cards; -1 means no child
 			});
 		log('in makeDeck(); id=' + id + ', s=' + s + ', v=' + v);
-		id += 1;
+		id +=1;
 		}
 	}
 	return deck;
@@ -249,8 +257,8 @@ function shuffle(deck) {
 		deck[j] = tempi;
 	}
 	 // reset id and idNum after shuffling
-	for (var i=0; i<deck.length; i++) {
-		deck[i].id = 'card-'+i;
+	for (var i = 0; i < deck.length; i++ ) {
+		deck[i].id = 'card-' + i;
 		deck[i].idNum = i;
 	}
 	return deck;
@@ -258,25 +266,26 @@ function shuffle(deck) {
 
 function loadCards(deck) {
 	// loads the cards onto the stock before dealing
-	for (var i=0; i<deck.length; i++) {
+	for (var i = 0; i < deck.length; i++ ) {
 		$('#board').append(
-			$('<div class="card" style="top: ' + margin + 'px; left: ' + margin + 'px;"></div>')
+			$('<div class="card" style="top: ' + _sol.margin + 'px; left: ' + _sol.margin + 'px;"></div>')
 			.css('color', deck[i].colour)
 			.css('zIndex', i)
-			.attr('id', 'card-'+i)
+			.attr('id', 'card-' + i)
 			.css('position', 'absolute')
 		);
-		$('#card-'+i).unbind(); // remove any event handlers from before
-		log('in loadCards(); unbinding events from card-'+i);
-		deck[i].posX = margin;
-		deck[i].posY = margin;
+		$('#card-' + i).unbind(); // remove any event handlers from before
+		log('in loadCards(); unbinding events from card-' + i);
+		deck[i].posX = _sol.margin;
+		deck[i].posY = _sol.margin;
 		deck[i].location = 'stock';
 		deck[i].face = 'down';
 		deck[i].zIndex = i;
 		deck[i].parentId = -1;
 		deck[i].childId = -1;
-		log('in loadCards(); card-' + i+ '; '+ printObject(deck[i]));
+		log('in loadCards(); card-' + i +  '; ' +  printObject(_sol.deck[i]));
 	}
+	return deck
 }
 
 function deal(deck) {
@@ -286,31 +295,31 @@ function deal(deck) {
 	log(' ');
 	var cardIndex = 51; // start counting down
 	for (var mainLoop=7; mainLoop>0; mainLoop--) {
-		var thisTop = height + margin * (7 - mainLoop + 1);
-		var thisLeft = width * (7 - mainLoop) + margin;
-		zIndex += 1;
-		$('#card-'+cardIndex)
+		var thisTop = _sol.height + _sol.margin * (7 - mainLoop + 1);
+		var thisLeft = _sol.width * (7 - mainLoop) + _sol.margin;
+		_sol.zIndex +=1;
+		$('#card-' + cardIndex)
 			.css('background', 'white')
 			.css('top', thisTop + 'px')
 			.css('left', thisLeft + 'px')
-			.css('z-index', zIndex)
+			.css('z-index', _sol.zIndex)
 			.html(deck[cardIndex].val + '&' + deck[cardIndex].suit + ';');
-		deck[cardIndex].zIndex = zIndex;
+		deck[cardIndex].zIndex = _sol.zIndex;
 		deck[cardIndex].posX = thisLeft;
 		deck[cardIndex].posY = thisTop;
 		deck[cardIndex].location = 'play';
 		log('in deal(); card-' + cardIndex + ', ' + printObject(deck[cardIndex]));
 		deck[cardIndex].face = 'up';
 		cardIndex -= 1;
-		for (var i=cardIndex; i>cardIndex-mainLoop+1; i--) {
-			zIndex += 1;
-			var thisLeft = (width*(cardIndex-i+7-mainLoop+1)) + margin;
-			$('#card-'+i).css('top', thisTop + 'px').css('left', thisLeft + 'px').css('z-index', zIndex);
-			deck[i].zIndex = zIndex;
+		for (var i = cardIndex; i > cardIndex - mainLoop + 1; i--) {
+			_sol.zIndex +=1;
+			var thisLeft = (_sol.width*(cardIndex - i + 7 - mainLoop + 1)) + _sol.margin;
+			$('#card-' + i).css('top', thisTop + 'px').css('left', thisLeft + 'px').css('z-index', _sol.zIndex);
+			deck[i].zIndex = _sol.zIndex;
 			deck[i].posX = thisLeft;
 			deck[i].posY = thisTop;
 			deck[i].location = 'play';
-			log('(in deal(); card-' + i + ', ' + printObject(deck[i]));
+			log('(in deal(); card-' + i + ', ' + printObject(_sol.deck[i]));
 		}
 		cardIndex -= mainLoop-1;
 	}
@@ -319,21 +328,21 @@ function deal(deck) {
 
 function playGame(deck) {
     // main function to enable game play
-	for (i=0; i < deck.length; i++) {
+	for (i=0; i < deck.length; i++ ) {
 
 		// handle cards that are facing up
 		if (deck[i].face == 'up') { 
-			log('in playGame(); Card is face-up:'+ i+'; '+ printObject(deck[i]));
-			makeDraggable('card-'+i); // add the draggable event handler
+			log('in playGame(); Card is face-up:' +  i + '; ' +  printObject(deck[i]));
+			makeDraggable('card-' + i); // add the draggable event handler
 
 		// handle cards that are facing down
 		} else { 
-			log('in playGame(); Card is face-down: id ='+ i+ ', ' + printObject(deck[i]));
+			log('in playGame(); Card is face-down: id =' +  i +  ', ' + printObject(deck[i]));
 			// add click handlers to the cards in the stock
 			if (deck[i].location == 'stock') { // click on a card in the stock to move it to the waste
-				log('in playGame(); Card in stock: id ='+ i+ ', '+ printObject(deck[i]));
+				log('in playGame(); Card in stock: id =' +  i +  ', ' +  printObject(deck[i]));
 				var thisId = i;
-				$('#card-'+i)
+				$('#card-' + i)
 					.mouseenter(function() {
 						$(this)
 						    .css('cursor', 'pointer')
@@ -343,7 +352,7 @@ function playGame(deck) {
 					
 			} else if (deck[i].location == 'play') { // turned-down card in play
 			    var thisId = i;
-				$('#card-'+i)
+				$('#card-' + i)
 					.mouseenter(function() {
 						$(this)
 						    .css('cursor', 'pointer')
@@ -359,11 +368,12 @@ function playGame(deck) {
 			$(this).css('cursor', 'pointer');
 		})
     	.click(restoreStock);
+    return deck;
 }
 
 function makeDraggable(id) {
     // implements the functionality to make a card draggable
-	$('#'+id)
+	$('#' + id)
     .mouseenter(function() {
 		$(this)
 		.css('cursor', 'pointer')
@@ -384,25 +394,25 @@ function makeDraggable(id) {
 
 function makeDblClick(id) {
 	// adds an event handler to double-click and auto-move into the foundation if applicable
-	$('#'+id)
+	$('#' + id)
 		.dblclick(function() {
 			thisIdNum = parseInt(this.id.replace('card-',''));
-			console.log('dblclick fired on '+ id);
+			console.log('dblclick fired on ' +  id);
 			var thisTop = 20;
 			var thisLeft = [224, 292, 360, 428];
-			for (i=0;i<thisLeft.length;i++) {
+			for (i=0;i<thisLeft.length;i++ ) {
 				var elem = document.elementFromPoint(thisLeft[i], thisTop);
 				console.log('foundation id: ' + elem.id + ', substring: ' + elem.id.substring(0,10));
-				if (elem.id.substring(0,10) == 'foundation' && deck[thisIdNum].val == 'A') {
-					log('in makeDblClick(); the '+deck[thisIdNum].val+' of '+deck[thisIdNum].suit+' moves to '+elem.id+'.');
+				if (elem.id.substring(0,10) == 'foundation' && _sol.deck[thisIdNum].val == 'A') {
+					log('in makeDblClick(); the ' + _sol.deck[thisIdNum].val + ' of ' + _sol.deck[thisIdNum].suit + ' moves to ' + elem.id + '.');
 					moveFoundation('ace', this.id, elem.id);
 					
 					break;
 				} else { // there's a card on the foundation
 					var thisElemNum = parseInt(elem.id.replace('card-',''));
-					log('thisIdNum='+thisIdNum+', thisElemNum='+thisElemNum);
-					if (thisElemNum && deck[thisIdNum].suit == deck[thisElemNum].suit && deck[thisIdNum].valNum == deck[thisElemNum].valNum+1) {
-						log('in makeDblClick(); the '+deck[thisIdNum].val+' of '+deck[thisIdNum].suit+' moves to '+elem.id+'.');
+					log('thisIdNum=' + thisIdNum + ', thisElemNum=' + thisElemNum);
+					if (thisElemNum && _sol.deck[thisIdNum].suit == _sol.deck[thisElemNum].suit && _sol.deck[thisIdNum].valNum == _sol.deck[thisElemNum].valNum + 1) {
+						log('in makeDblClick(); the ' + _sol.deck[thisIdNum].val + ' of ' + _sol.deck[thisIdNum].suit + ' moves to ' + elem.id + '.');
 						moveFoundation('', this.id, elem.id);
 						break;
 					}
@@ -416,21 +426,21 @@ function dragStop() {
     // controls what happens when you stop dragging a card
 	// TODO: big hairy function should be broken up into discrete functions
 	var this_id = this.id;
-	var this_card = deck[parseInt(this_id.replace('card-', ''))];
-	log('in dragStop(); Card moved: '+ printObject(this_card));
+	var this_card = _sol.deck[parseInt(this_id.replace('card-', ''))];
+	log('in dragStop(); Card moved: ' +  printObject(this_card));
 	
 	// look to see if there is a card under the drop spot
-	var pos = $('#'+this_id).position();
-	$('#'+this_id).css('display', 'none'); // hide card to search beneath it
-	var elem = document.elementFromPoint(pos.left+20, pos.top+20);
+	var pos = $('#' + this_id).position();
+	$('#' + this_id).css('display', 'none'); // hide card to search beneath it
+	var elem = document.elementFromPoint(pos.left + 20, pos.top + 20);
 	var elem_id = elem.id;
-	var elem_class = $('#'+elem_id).attr('class');
+	var elem_class = $('#' + elem_id).attr('class');
 	log(elem_id.substring(0,5));
 	
 	// trying to place a card on another card
 	if (elem_id.substring(0,5) == 'card-') { 
-		var under_card = deck[parseInt(elem_id.replace('card-',''))];
-		log('in dragStop(); under_card: '+ printObject(under_card));
+		var under_card = _sol.deck[parseInt(elem_id.replace('card-',''))];
+		log('in dragStop(); under_card: ' +  printObject(under_card));
 		
 		// test whether the drop is valid
 		
@@ -469,7 +479,7 @@ function dragStop() {
 		
 	// trying to place a card on a bed
 	} else if (elem_class == 'bed') { 
-		log('elem_id='+ elem_id+ ', elem_class ='+ $('#'+elem_id).attr('class'));
+		log('elem_id=' +  elem_id +  ', elem_class =' +  $('#' + elem_id).attr('class'));
 		
 		// trying to put an ace on an empty foundation
 		if (elem_id.substring(0,10) == 'foundation' // the bed needs to be a foundation bed
@@ -492,8 +502,8 @@ function dragStop() {
 				&& this_card.val == 'K' // the card needs to be a king
 			) {
 
-			this_card.posX = parseInt($('#'+elem_id).css('left').replace('px', ''));
-			this_card.posY = parseInt($('#'+elem_id).css('top').replace('px', ''));
+			this_card.posX = parseInt($('#' + elem_id).css('left').replace('px', ''));
+			this_card.posY = parseInt($('#' + elem_id).css('top').replace('px', ''));
 			if (this_card.location == 'foundation') { // don't forget to decrement score if moving a king off the foundation
 				score -= 1;
 				updateScore();
@@ -505,9 +515,9 @@ function dragStop() {
 			notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into an empty playing area.');
 			
 			// need to check whether any cards are on the king, i.e. another card has the king's id as a parentId
-			for (var check=0; check<deck.length; check++) {
-				if (deck[check].parentId == this_card.id) {
-					putCardOnCard(deck[check].id, this_card.id); // recursive so it will capture any other cards below
+			for (var check=0; check<_sol.deck.length; check++ ) {
+				if (_sol.deck[check].parentId == this_card.id) {
+					putCardOnCard(_sol.deck[check].id, this_card.id); // recursive so it will capture any other cards below
 					break;
 				}
 			}
@@ -525,20 +535,20 @@ function dragStop() {
 		
 	// trying to place a card somewhere else on the board
 	} else { 
-		log('elem_id ='+ elem_id+ ', elem_class='+ $('#'+elem_id).attr('class'));
+		log('elem_id =' +  elem_id +  ', elem_class=' +  $('#' + elem_id).attr('class'));
 		$(this).css('top', this_card.posY).css('left', this_card.posX);
 
 		notify('You cannot place a card elsewhere on the board.');
 		
 	}
-	log('in dragStop(); elem_id='+elem_id+', '+ pos.left+', '+ pos.top);
-	$('#'+this_id).css('display', 'block'); // restore visibility after hiding
+	log('in dragStop(); elem_id=' + elem_id + ', ' +  pos.left + ', ' +  pos.top);
+	$('#' + this_id).css('display', 'block'); // restore visibility after hiding
 }
 
 function findCardFromId(id) {
     // returns an object from the deck with a given id
-    for (var i=0; i<deck.length; i++) {
-        if (deck[i].id == id) {
+    for (var i=0; i<_sol.deck.length; i++ ) {
+        if (_sol.deck[i].id == id) {
             return i;
         }
     }
@@ -549,18 +559,18 @@ function moveFoundation(which, card_id, elem_id) {
 	// moves a card from the playing area to the foundation
 	if (which == 'ace') {
 		var deckId = parseInt(card_id.replace('card-', ''));
-		var this_card = deck[deckId];
-		this_card.posX = $('#'+elem_id).css('left');
-		this_card.posY = $('#'+elem_id).css('top');
-		log('in moveFoundation(); deckId='+deckId+', card_id='+card_id+', elem_id='+elem_id+', deckId='+ deckId + ', this_card.posX='+this_card.posX+', this_card.posY='+ this_card.posY);
+		var this_card = _sol.deck[deckId];
+		this_card.posX = $('#' + elem_id).css('left');
+		this_card.posY = $('#' + elem_id).css('top');
+		log('in moveFoundation(); deckId=' + deckId + ', card_id=' + card_id + ', elem_id=' + elem_id + ', deckId=' +  deckId + ', this_card.posX=' + this_card.posX + ', this_card.posY=' +  this_card.posY);
 		this_card.location = 'foundation';
 		this_card.parentId = -1;
-		$('#'+card_id)
+		$('#' + card_id)
 			.css('left', this_card.posX)
 			.css('top', this_card.posY)
 			.unbind('dblclick');
-		score += 1;
-		log('score='+ score);
+		score +=1;
+		log('score=' +  score);
 		updateScore();
 		notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into the foundation.');
 		return;
@@ -569,28 +579,28 @@ function moveFoundation(which, card_id, elem_id) {
 
 		var cardIdNum = parseInt(card_id.replace('card-', ''));
 		var underIdNum = parseInt(elem_id.replace('card-', ''));
-		var this_card = deck[cardIdNum];
-		var under_card = deck[underIdNum];
+		var this_card = _sol.deck[cardIdNum];
+		var under_card = _sol.deck[underIdNum];
 		this_card.posX = under_card.posX;
 		this_card.posY = under_card.posY;
 		this_card.location = 'foundation';
-		$('#'+this_card.id)
+		$('#' + this_card.id)
 			.css('left', this_card.posX)
 			.css('top', this_card.posY)
-			.css('zIndex', under_card.zIndex+1)
+			.css('zIndex', under_card.zIndex + 1)
 			.unbind('dblclick');
 		this_card.zIndex = under_card.zIndex + 1;
-		$('#'+this_card.id).css('zIndez', this_card.zIndex);
+		$('#' + this_card.id).css('zIndez', this_card.zIndex);
 		this_card.parentId = under_card.id;
 		this_card.parentId = -1;
-		for (var check=0; check< deck.length; check++) {
-			if (deck[check].childId == this_card.id) {
-				deck[check].childId = -1; // detach parent cards
+		for (var check=0; check< _sol.deck.length; check++ ) {
+			if (_sol.deck[check].childId == this_card.id) {
+				_sol.deck[check].childId = -1; // detach parent cards
 				break;
 			}
 		}
-		score += 1;
-		log('score='+ score);
+		score +=1;
+		log('score=' +  score);
 		updateScore();
 		notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into the foundation.');
 	}
@@ -599,35 +609,35 @@ function moveFoundation(which, card_id, elem_id) {
 function putCardOnCard(this_card_id, under_card_id) {
 	// place a card on another card in the playing area
 	// NOT for use placing a card on a card in the foundation
-    log('in putCardOnCard(); this_card_id='+ this_card_id+', under_card_id='+ under_card_id);
+    log('in putCardOnCard(); this_card_id=' +  this_card_id + ', under_card_id=' +  under_card_id);
     // puts a card on another card in the playing area
     
-    var this_card = deck[findCardFromId(this_card_id)];
-    var under_card = deck[findCardFromId(under_card_id)];
-    log('in putCardOnCard(); top card BEFORE: '+ this_card_id+', '+ findCardFromId(this_card_id)+', '+ printObject(this_card));
-    log('in putCardOnCard(); under card BEFORE: '+ under_card_id+', '+ findCardFromId(under_card_id)+', '+ printObject(under_card));
+    var this_card = _sol.deck[findCardFromId(this_card_id)];
+    var under_card = _sol.deck[findCardFromId(under_card_id)];
+    log('in putCardOnCard(); top card BEFORE: ' +  this_card_id + ', ' +  findCardFromId(this_card_id) + ', ' +  printObject(this_card));
+    log('in putCardOnCard(); under card BEFORE: ' +  under_card_id + ', ' +  findCardFromId(under_card_id) + ', ' +  printObject(under_card));
 	
 	this_card.posX = under_card.posX;
-	this_card.posY = under_card.posY+20;
+	this_card.posY = under_card.posY + 20;
 	this_card.zIndex = under_card.zIndex + 1;
 	if (this_card.location == 'foundation') {
 		score -= 1; // decrement score when taking a card out of the foundation
 		updateScore(); // update the displayed score
 	}
 	this_card.location = 'play'; // for cards moved from the waste or the foundation
-	$('#'+this_card_id)
+	$('#' + this_card_id)
 	    .css('left', this_card.posX)
 	    .css('top', this_card.posY)
 	    .css('zIndex', this_card.zIndex);
-	log('in putCardOnCard(); <div id="'+this_card_id+'">: left='+ $('#'+this_card_id).css('left')+ ', top='+ $('#'+this_card_id).css('top')+ ', zIndex='+ $('#card-'+this_card_id).css('zIndex'));
+	log('in putCardOnCard(); <div id="' + this_card_id + '">: left=' +  $('#' + this_card_id).css('left') +  ', top=' +  $('#' + this_card_id).css('top') +  ', zIndex=' +  $('#card-' + this_card_id).css('zIndex'));
 
 	this_card.parentId = under_card.id;
 	under_card.childId = this_card.id;
 
 	notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' on the ' + displayVal(under_card.val) + ' of ' + displaySuit(under_card.suit) + '.');
 
-    log('in putCardOnCard(); top card AFTER: '+ this_card_id+', '+ findCardFromId(this_card_id)+', '+ printObject(this_card));
-    log('in putCardOnCard(); under card AFTER: '+ under_card_id+', '+ findCardFromId(under_card_id)+', '+ printObject(under_card));	
+    log('in putCardOnCard(); top card AFTER: ' +  this_card_id + ', ' +  findCardFromId(this_card_id) + ', ' +  printObject(this_card));
+    log('in putCardOnCard(); under card AFTER: ' +  under_card_id + ', ' +  findCardFromId(under_card_id) + ', ' +  printObject(under_card));	
 	
     if (this_card.childId != -1) {
         // gettin' all recursive in yo biznitch
@@ -641,49 +651,49 @@ function turnStock() {
 	var thisId = parseInt(this.id.replace('card-', ''));
 	// first, get the id of the waste
 	var thisWaste = document.elementFromPoint(88, 20);
-	var thisZindex = $('#'+thisWaste.id).css('zIndex');
+	var thisZindex = $('#' + thisWaste.id).css('zIndex');
 	if (thisZindex == 'auto') {
 	    thisZindex = 1;
 	} else {
 	    thisZindex = parseInt(thisZindex);
 	}
 	// now update the card properties in the deck
-	deck[thisId].zIndex = thisZindex + 1;
-	deck[thisId].posX = 78;
-	deck[thisId].posY = 10;
-	deck[thisId].face = 'up';
-	deck[thisId].location = 'waste';
+	_sol.deck[thisId].zIndex = thisZindex + 1;
+	_sol.deck[thisId].posX = 78;
+	_sol.deck[thisId].posY = 10;
+	_sol.deck[thisId].face = 'up';
+	_sol.deck[thisId].location = 'waste';
 	// now update the div corresponding to the card
 	$(this)
-		.css('left', deck[thisId].posX+'px')
-		.css('top', deck[thisId].posY+'px')
+		.css('left', _sol.deck[thisId].posX + 'px')
+		.css('top', _sol.deck[thisId].posY + 'px')
 		.css('background', 'white')
-		.css('zIndex', deck[thisId].zIndex)
-		.html(deck[thisId].val + '&' + deck[thisId].suit + ';');
+		.css('zIndex', _sol.deck[thisId].zIndex)
+		.html(_sol.deck[thisId].val + '&' + _sol.deck[thisId].suit + ';');
 	makeDraggable(this.id);
 
 	// don't forget to remove the click event handler from when it was on the stock
 	$(this).unbind('click');
 	
-	notify('You moved the ' + displayVal(deck[thisId].val) + ' of ' + displaySuit(deck[thisId].suit) + ' from the stock to the waste.');
+	notify('You moved the ' + displayVal(_sol.deck[thisId].val) + ' of ' + displaySuit(_sol.deck[thisId].suit) + ' from the stock to the waste.');
 }
 
 function flipCard() {
     // this flips over a turned-down card in the play area
     var thisId = parseInt(this.id.replace('card-', ''));
     // make sure there aren't any cards on top of this card
-    var elem = document.elementFromPoint(deck[thisId].posX+10, deck[thisId].posY+30);
-    log('this.id = '+this.id+ ', deck[thisId].posX+10='+ deck[thisId].posX+10+', deck[thisId].posY+30='+ deck[thisId].posY+30+ ', elem.id='+ elem.id);
+    var elem = document.elementFromPoint(_sol.deck[thisId].posX + 10, _sol.deck[thisId].posY + 30);
+    log('this.id = ' + this.id +  ', _sol.deck[thisId].posX + 10=' +  _sol.deck[thisId].posX + 10 + ', _sol.deck[thisId].posY + 30=' +  _sol.deck[thisId].posY + 30 +  ', elem.id=' +  elem.id);
 
     if (elem.id == this.id) {
-        deck[thisId].face = 'up';
-        log(deck[thisId]);
-        $('#'+this.id)
+        _sol.deck[thisId].face = 'up';
+        log(_sol.deck[thisId]);
+        $('#' + this.id)
             .css('background', 'white')
-            .html(deck[thisId].val + '&' + deck[thisId].suit + ';');
+            .html(_sol.deck[thisId].val + '&' + _sol.deck[thisId].suit + ';');
         makeDraggable(this.id);
     
-        notify('You flipped over the ' + displayVal(deck[thisId].val) + ' of ' + displaySuit(deck[thisId].suit) + '.');
+        notify('You flipped over the ' + displayVal(_sol.deck[thisId].val) + ' of ' + displaySuit(_sol.deck[thisId].suit) + '.');
     
     } else {
         notify('You cannot flip a card that is covered by another card.');
@@ -697,7 +707,7 @@ function notify(message) {
 
 function restoreStock() {
     // returns all the cards from the waste back into the stock
-    var zIndex = 0;
+    _sol.zIndex = 0;
     var cardsLeft = true;
     var totalCards = 0;
     while (cardsLeft == true) {
@@ -706,18 +716,18 @@ function restoreStock() {
             cardsLeft == false;
             break;
         } else {
-            totalCards += 1;
-            zIndex += 1;
+            totalCards +=1;
+            _sol.zIndex +=1;
             var thisId = parseInt(elem.id.replace('card-', ''));
-            deck[thisId].posX = 10;
-            deck[thisId].posY = 10;
-            deck[thisId].zIndex = zIndex;
-            deck[thisId].location = 'stock';
-            deck[thisId].face = 'down';
-            $('#card-'+thisId)
-                .css('left', deck[thisId].posX)
-                .css('top', deck[thisId].posY)
-                .css('zIndex', zIndex)
+            _sol.deck[thisId].posX = 10;
+            _sol.deck[thisId].posY = 10;
+            _sol.deck[thisId].zIndex = _sol.zIndex;
+            _sol.deck[thisId].location = 'stock';
+            _sol.deck[thisId].face = 'down';
+            $('#card-' + thisId)
+                .css('left', _sol.deck[thisId].posX)
+                .css('top', _sol.deck[thisId].posY)
+                .css('zIndex', _sol.zIndex)
                 .css('backgroundImage', 'url(img/tile.png)')
 				.html('')
 				.click(turnStock); // don't forget to reattach the event handler to turn from the stock onto the waste
@@ -754,7 +764,7 @@ function printObject(dict) {
 }
 
 function log(message) {
-	if (debugMode == false) {
+	if (_sol.debugMode == false) {
 		return;
 	}
 	console.log(message);
