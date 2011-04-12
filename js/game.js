@@ -1,9 +1,9 @@
 // global variables
 var _sol = {
     __description__: 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.',
-    __version__: 0.14,
+    __version__: 0.15,
     __author__: 'Ryan McGreal',
-    __releasedate__: '2011-04-06',
+    __releasedate__: '2011-04-11',
     __homepage__: 'http://quandyfactory.com/projects/74/solitaire',
     __copyright__: '(C) 2011 by Ryan McGreal',
     __licence__: 'GNU General Public Licence, Version 2',
@@ -164,6 +164,12 @@ function undo() {
     log('thisDeck: ');
     log(thisDeck);
     
+    // 4. Cycle through the deck, remove all existing event handlers and re-add them
+	for (i=0; i < deck.length; i++ ) {
+	    _sol.deck[i].unbind(); // remove any existing handler
+	    attachHandlers(i); // attach proper handler for its position and face
+	}
+    
     _sol.deck = thisDeck;
     
     log('_sol.deck: ');
@@ -220,7 +226,6 @@ function about() {
 	output.push('<li>Homepage: <a target="_blank" href="' + _sol.__homepage__ + '">' + _sol.__homepage__ + '</a></li>');
 	output.push('</ul>');
 	output.push('</div>');
-	
 	$('body').append($(output.join('\n')));
 	$('#about_pane')
 		.mouseenter(function() {
@@ -378,7 +383,6 @@ function loadCards(deck) {
 	return deck
 }
 
-
 function deal(deck) {
 	// deals a deck onto the playing area
 	log(' ');
@@ -421,38 +425,7 @@ function deal(deck) {
 function playGame(deck) {
     // main function to enable game play
 	for (i=0; i < deck.length; i++ ) {
-
-		// handle cards that are facing up
-		if (deck[i].face == 'up') { 
-			log('in playGame(); Card is face-up:' +  i + '; ' +  printObject(deck[i]));
-			makeDraggable('card-' + i); // add the draggable event handler
-
-		// handle cards that are facing down
-		} else { 
-			log('in playGame(); Card is face-down: id =' +  i +  ', ' + printObject(deck[i]));
-			// add click handlers to the cards in the stock
-			if (deck[i].location == 'stock') { // click on a card in the stock to move it to the waste
-				log('in playGame(); Card in stock: id =' +  i +  ', ' +  printObject(deck[i]));
-				var thisId = i;
-				$('#card-' + i)
-					.mouseenter(function() {
-						$(this)
-						    .css('cursor', 'pointer')
-						    .attr('title', 'Click on this card to turn it over');
-					})
-					.click(turnStock);
-					
-			} else if (deck[i].location == 'play') { // turned-down card in play
-			    var thisId = i;
-				$('#card-' + i)
-					.mouseenter(function() {
-						$(this)
-						    .css('cursor', 'pointer')
-						    .attr('title', 'Click on this card to flip it');
-					})
-					.click(flipCard);
-			}
-		}
+	    attachHandlers(i);
 	}
 	// click on the empty stock and restore the cards from the waste
 	$('#stock')
@@ -461,6 +434,43 @@ function playGame(deck) {
 		})
     	.click(restoreStock);
     return deck;
+}
+
+function attachHandlers(i) {
+    // attches event handlers to cards by index
+    // primary use is inside the main loop in playGame(); but also used in undo()
+    
+	// handle cards that are facing up
+	if (_sol.deck[i].face == 'up') { 
+		log('in playGame(); Card is face-up:' +  i + '; ' +  printObject(_sol.deck[i]));
+		makeDraggable('card-' + i); // add the draggable event handler
+
+	// handle cards that are facing down
+	} else { 
+		log('in playGame(); Card is face-down: id =' +  i +  ', ' + printObject(_sol.deck[i]));
+		// add click handlers to the cards in the stock
+		if (_sol.deck[i].location == 'stock') { // click on a card in the stock to move it to the waste
+			log('in playGame(); Card in stock: id =' +  i +  ', ' +  printObject(_sol.deck[i]));
+			var thisId = i;
+			$('#card-' + i)
+				.mouseenter(function() {
+					$(this)
+					    .css('cursor', 'pointer')
+					    .attr('title', 'Click on this card to turn it over');
+				})
+				.click(turnStock);
+				
+		} else if (_sol.deck[i].location == 'play') { // turned-down card in play
+		    var thisId = i;
+			$('#card-' + i)
+				.mouseenter(function() {
+					$(this)
+					    .css('cursor', 'pointer')
+					    .attr('title', 'Click on this card to flip it');
+				})
+				.click(flipCard);
+		}
+	}
 }
 
 function makeDraggable(id) {
@@ -498,7 +508,6 @@ function makeDblClick(id) {
 				if (elem.id.substring(0,10) == 'foundation' && _sol.deck[thisIdNum].val == 'A') {
 					log('in makeDblClick(); the ' + _sol.deck[thisIdNum].val + ' of ' + _sol.deck[thisIdNum].suit + ' moves to ' + elem.id + '.');
 					moveFoundation('ace', this.id, elem.id);
-					
 					break;
 				} else { // there's a card on the foundation
 					var thisElemNum = parseInt(elem.id.replace('card-',''));
@@ -512,7 +521,6 @@ function makeDblClick(id) {
 			}
 		});
 }
-
 
 function dragStop() {
     // controls what happens when you stop dragging a card
@@ -543,9 +551,7 @@ function dragStop() {
 				&& this_card.colour != under_card.colour  // colours must be opposite
 				&& this_card.valNum == under_card.valNum - 1 // card must be one less than card under
 			) {
-
             putCardOnCard(this_card.id, under_card.id);
-			
 		// trying to put a card on another card in the foundation area
 		} else if ( 
 				under_card.face == 'up' // card under must be face up
@@ -553,39 +559,29 @@ function dragStop() {
 				&& this_card.suit == under_card.suit // same suit
 				&& this_card.valNum == under_card.valNum + 1 // card must be one more than card under
 			) {
-
 			moveFoundation('', this_card.id, under_card.id);
-		
 		// card isn't turned up
 		} else if (under_card.face == 'down') { 
 			$(this).css('top', this_card.posY).css('left', this_card.posX);
-
 			notify('You cannot place your card on a card that has not been turned up yet.');
-			
 		} else {
 			$(this).css('top', this_card.posY).css('left', this_card.posX);
-
 			notify('You cannot place the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' on the ' + displayVal(under_card.val) + ' of ' + displaySuit(under_card.suit) + '.');
-
 		}
-		
 	// trying to place a card on a bed
 	} else if (elem_class == 'bed') { 
 		log('elem_id=' +  elem_id +  ', elem_class =' +  $('#' + elem_id).attr('class'));
-		
 		// trying to put an ace on an empty foundation
 		if (elem_id.substring(0,10) == 'foundation' // the bed needs to be a foundation bed
 			&& this_card.val == 'A' // the card needs to be an ace, duh
 			) {
 			moveFoundation('ace', this_card.id, elem_id);
-
 		// trying to put something other than an ace on the empty foundation
 		} else if ( 
 				elem_id.substring(0,10) == 'foundation' 
 			) {
 			$(this).css('top', this_card.posY).css('left', this_card.posX);							
 			notify('You cannot place the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' directly on the foundation.');
-
         // trying to put a king on a play bed
 		} else if ( 
 				elem_id.substring(0,5) == 'play_' // the bed has to be a play bed
@@ -602,7 +598,6 @@ function dragStop() {
 			$(this).css('left', this_card.posX).css('top', this_card.posY);
 			notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into an empty playing area.');
 			addHistory(_sol.deck);
-			
 			// need to check whether any cards are on the king, i.e. another card has the king's id as a parentId
 			for (var check=0; check<_sol.deck.length; check++ ) {
 				if (_sol.deck[check].parentId == this_card.id) {
@@ -610,25 +605,18 @@ function dragStop() {
 					break;
 				}
 			}
-			
 		// trying to put something other than a king on a play bed
 		} else if ( 
 				elem_id.substring(0,5) == 'play_' // the bed is a play bed
 			) {
-
 			$(this).css('top', this_card.posY).css('left', this_card.posX);							
-
 			notify('You cannot place the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' directly on the playing area.');
-			
 		}
-		
 	// trying to place a card somewhere else on the board
 	} else { 
 		log('elem_id =' +  elem_id +  ', elem_class=' +  $('#' + elem_id).attr('class'));
 		$(this).css('top', this_card.posY).css('left', this_card.posX);
-
 		notify('You cannot place a card elsewhere on the board.');
-		
 	}
 	log('in dragStop(); elem_id=' + elem_id + ', ' +  pos.left + ', ' +  pos.top);
 	$('#' + this_id).css('display', 'block'); // restore visibility after hiding
@@ -664,9 +652,7 @@ function moveFoundation(which, card_id, elem_id) {
 		notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into the foundation.');
 		addHistory(_sol.deck);
 		return;
-
 	} else {
-
 		var cardIdNum = parseInt(card_id.replace('card-', ''));
 		var underIdNum = parseInt(elem_id.replace('card-', ''));
 		var this_card = _sol.deck[cardIdNum];
@@ -702,13 +688,11 @@ function putCardOnCard(this_card_id, under_card_id) {
 	// NOT for use placing a card on a card in the foundation
     log('in putCardOnCard(); this_card_id=' +  this_card_id + ', under_card_id=' +  under_card_id);
     // puts a card on another card in the playing area
-    
     var this_card = _sol.deck[findCardFromId(this_card_id)];
     var under_card = _sol.deck[findCardFromId(under_card_id)];
     log('in putCardOnCard(); top card BEFORE: ' +  this_card_id + ', ' +  findCardFromId(this_card_id) + ', ' +  printObject(this_card));
     log('in putCardOnCard(); under card BEFORE: ' +  under_card_id + ', ' +  findCardFromId(under_card_id) + ', ' +  printObject(under_card));
-	
-	this_card.posX = under_card.posX;
+    this_card.posX = under_card.posX;
 	this_card.posY = under_card.posY + 20;
 	this_card.zIndex = under_card.zIndex + 1;
 	if (this_card.location == 'foundation') {
@@ -721,21 +705,16 @@ function putCardOnCard(this_card_id, under_card_id) {
 	    .css('top', this_card.posY)
 	    .css('zIndex', this_card.zIndex);
 	log('in putCardOnCard(); <div id="' + this_card_id + '">: left=' +  $('#' + this_card_id).css('left') +  ', top=' +  $('#' + this_card_id).css('top') +  ', zIndex=' +  $('#card-' + this_card_id).css('zIndex'));
-
 	this_card.parentId = under_card.id;
 	under_card.childId = this_card.id;
-
 	notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' on the ' + displayVal(under_card.val) + ' of ' + displaySuit(under_card.suit) + '.');
-
     log('in putCardOnCard(); top card AFTER: ' +  this_card_id + ', ' +  findCardFromId(this_card_id) + ', ' +  printObject(this_card));
     log('in putCardOnCard(); under card AFTER: ' +  under_card_id + ', ' +  findCardFromId(under_card_id) + ', ' +  printObject(under_card));	
-	
     if (this_card.childId != -1) {
         // gettin' all recursive in yo biznitch
         putCardOnCard(this_card.childId, this_card.id)
     }
     addHistory(_sol.deck);
-
 }
 
 function turnStock() {
@@ -763,10 +742,8 @@ function turnStock() {
 		.css('zIndex', _sol.deck[thisId].zIndex)
 		.html(_sol.deck[thisId].val + '&' + _sol.deck[thisId].suit + ';');
 	makeDraggable(this.id);
-
 	// don't forget to remove the click event handler from when it was on the stock
 	$(this).unbind('click');
-	
 	notify('You moved the ' + displayVal(_sol.deck[thisId].val) + ' of ' + displaySuit(_sol.deck[thisId].suit) + ' from the stock to the waste.');
 	addHistory(_sol.deck);
 }
@@ -777,7 +754,6 @@ function flipCard() {
     // make sure there aren't any cards on top of this card
     var elem = document.elementFromPoint(_sol.deck[thisId].posX + 10, _sol.deck[thisId].posY + 30);
     log('this.id = ' + this.id +  ', _sol.deck[thisId].posX + 10=' +  _sol.deck[thisId].posX + 10 + ', _sol.deck[thisId].posY + 30=' +  _sol.deck[thisId].posY + 30 +  ', elem.id=' +  elem.id);
-
     if (elem.id == this.id) {
         _sol.deck[thisId].face = 'up';
         log(_sol.deck[thisId]);
@@ -785,9 +761,7 @@ function flipCard() {
             .css('background', 'white')
             .html(_sol.deck[thisId].val + '&' + _sol.deck[thisId].suit + ';');
         makeDraggable(this.id);
-    
         notify('You flipped over the ' + displayVal(_sol.deck[thisId].val) + ' of ' + displaySuit(_sol.deck[thisId].suit) + '.');
-    
     } else {
         notify('You cannot flip a card that is covered by another card.');
     }
@@ -837,7 +811,6 @@ function restoreStock() {
 
 function displayVal(val) {
 	// displays a card value in full language
-	
 	var kv = {'A': 'Ace', 'J': 'Jack', 'Q': 'Queen', 'K': 'King'};
 	if (kv.hasOwnProperty(val)) {
 		return kv[val];
