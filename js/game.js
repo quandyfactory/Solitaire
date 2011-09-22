@@ -15,7 +15,7 @@ var _sol = {
     vals: 'A 2 3 4 5 6 7 8 9 10 J Q K'.split(' '),
     zIndex: 51, // initialize zIndex so we can always put cards on top of each other
     score: 0, // increment by 1 each time you put a card on the foundation, decrement by 1 when you remove a card
-    debugMode: false, // set to true to send details to console.log
+    debugMode: true, // set to true to send details to console.log
     deck: [],
     history: []
 };
@@ -558,8 +558,19 @@ function dragStop() {
 				&& under_card.location == 'foundation' // card is in foundation
 				&& this_card.suit == under_card.suit // same suit
 				&& this_card.valNum == under_card.valNum + 1 // card must be one more than card under
+				&& this_card.location != 'foundation' // no double-points for cards already in foundation
 			) {
 			moveFoundation('', this_card.id, under_card.id);
+		// nudging a card that is already on a card on the foundation
+		} else if ( 
+				under_card.face == 'up' // card under must be face up
+				&& under_card.location == 'foundation' // card is in foundation
+				&& this_card.suit == under_card.suit // same suit
+				&& this_card.valNum == under_card.valNum + 1 // card must be one more than card under
+				&& this_card.location == 'foundation' // no double-points for cards already in foundation
+			) {
+			$(this).css('top', this_card.posY).css('left', this_card.posX);
+			notify('The ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' is on the ' + displayVal(under_card.val) + ' of ' + displaySuit(under_card.suit) + '.');
 		// card isn't turned up
 		} else if (under_card.face == 'down') { 
 			$(this).css('top', this_card.posY).css('left', this_card.posX);
@@ -618,7 +629,7 @@ function dragStop() {
 		$(this).css('top', this_card.posY).css('left', this_card.posX);
 		notify('You cannot place a card elsewhere on the board.');
 	}
-	log('in dragStop(); elem_id=' + elem_id + ', ' +  pos.left + ', ' +  pos.top);
+	log('in dragStop(); elem_id=' + elem_id + ', pos.left=' +  pos.left + ', pos.top=' +  pos.top);
 	$('#' + this_id).css('display', 'block'); // restore visibility after hiding
 }
 

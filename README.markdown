@@ -19,10 +19,14 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.15
-* Release Date: 2011-04-11
+* Version: 0.16
+* Release Date: 2011-09-21
 
 ### Revision History
+
+* Version: 0.16
+    * Release Date: 2011-09-21
+    * Changes: Fixed [bug #10](https://github.com/quandyfactory/Solitaire/issues/10).
 
 * Version: 0.15
     * Release Date: 2011-04-11
