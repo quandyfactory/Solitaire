@@ -1,9 +1,9 @@
 // global variables
 var _sol = {
     __description__: 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.',
-    __version__: 0.15,
+    __version__: 0.16,
     __author__: 'Ryan McGreal',
-    __releasedate__: '2011-04-11',
+    __releasedate__: '2011-09-21',
     __homepage__: 'http://quandyfactory.com/projects/74/solitaire',
     __copyright__: '(C) 2011 by Ryan McGreal',
     __licence__: 'GNU General Public Licence, Version 2',
