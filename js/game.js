@@ -1,9 +1,9 @@
 // global variables
 var _sol = {
     __description__: 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.',
-    __version__: 0.16,
+    __version__: 0.17,
     __author__: 'Ryan McGreal',
-    __releasedate__: '2011-09-21',
+    __releasedate__: '2011-09-22',
     __homepage__: 'http://quandyfactory.com/projects/74/solitaire',
     __copyright__: '(C) 2011 by Ryan McGreal',
     __licence__: 'GNU General Public Licence, Version 2',
@@ -651,13 +651,17 @@ function moveFoundation(which, card_id, elem_id) {
 		this_card.posX = $('#' + elem_id).css('left');
 		this_card.posY = $('#' + elem_id).css('top');
 		log('in moveFoundation(); deckId=' + deckId + ', card_id=' + card_id + ', elem_id=' + elem_id + ', deckId=' +  deckId + ', this_card.posX=' + this_card.posX + ', this_card.posY=' +  this_card.posY);
+		// increment score only if ace wasn't already moved to the foundation
+		if (this_card.location != 'foundation') {
+		    score +=1;
+		}
 		this_card.location = 'foundation';
 		this_card.parentId = -1;
 		$('#' + card_id)
 			.css('left', this_card.posX)
 			.css('top', this_card.posY)
 			.unbind('dblclick');
-		score +=1;
+		
 		log('score=' +  score);
 		updateScore();
 		notify('You placed the ' + displayVal(this_card.val) + ' of ' + displaySuit(this_card.suit) + ' into the foundation.');
