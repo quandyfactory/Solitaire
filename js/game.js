@@ -15,7 +15,7 @@ var _sol = {
     vals: 'A 2 3 4 5 6 7 8 9 10 J Q K'.split(' '),
     zIndex: 51, // initialize zIndex so we can always put cards on top of each other
     score: 0, // increment by 1 each time you put a card on the foundation, decrement by 1 when you remove a card
-    debugMode: true, // set to true to send details to console.log
+    debugMode: false, // set to true to send details to console.log
     deck: [],
     history: []
 };
