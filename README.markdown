@@ -19,10 +19,14 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.17
-* Release Date: 2011-09-22
+* Version: 0.18
+* Release Date: 2011-10-04
 
 ### Revision History
+
+* Version: 0.18
+    * Release Date: 2011-10-04
+    * Changes: Changed `_sol` namespace to `Sol` for purely aesthetic reasons; fixed [bug #8](https://github.com/quandyfactory/Solitaire/issues/8).
 
 * Version: 0.17
     * Release Date: 2011-09-22
