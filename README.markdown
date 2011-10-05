@@ -19,10 +19,14 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.18
+* Version: 0.19
 * Release Date: 2011-10-04
 
 ### Revision History
+
+* Version: 0.19
+    * Release Date: 2011-10-04
+    * Changes: Removed duplicate functions (addScore, updateScore, redeal); fixed [bug #12](https://github.com/quandyfactory/Solitaire/issues/12).
 
 * Version: 0.18
     * Release Date: 2011-10-04

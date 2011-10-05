@@ -45,6 +45,10 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
 	position: absolute; right: 0; bottom: 0; padding: 0 2px; 
 }
 
+#moves {
+	position: absolute; right: 0; bottom: 20px; padding: 0 2px; 
+}
+
 #tools {
 	position: absolute; bottom: 0; left: 0; width: 100%;
 	text-align: left;
