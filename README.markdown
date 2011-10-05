@@ -19,10 +19,14 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.19
+* Version: 0.20
 * Release Date: 2011-10-04
 
 ### Revision History
+
+* Version: 0.20
+    * Release Date: 2011-10-04
+    * Changes: Fixed up event handling; added Moves count.
 
 * Version: 0.19
     * Release Date: 2011-10-04
