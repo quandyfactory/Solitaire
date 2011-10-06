@@ -51,7 +51,7 @@ body { margin: 0; padding: 0; font-family: helvetica, arial, sans-serif; }
 
 #tools {
 	position: absolute; bottom: 0; left: 0; width: 100%;
-	text-align: left;
+	text-align: left; font-size: 70% !important;
 }
 
 #notification {

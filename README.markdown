@@ -19,10 +19,14 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.20
-* Release Date: 2011-10-04
+* Version: 0.30
+* Release Date: 2011-10-05
 
 ### Revision History
+
+* Version: 0.21
+    * Release Date: 2011-10-05
+    * Changes: Moved dblclick event function into named function doDoubleClick. Started setting up finish() but not ready yet. Cleaned up some console.log() calls.
 
 * Version: 0.20
     * Release Date: 2011-10-04

@@ -1,9 +1,9 @@
 // global variables
 var Sol = {
     __description__: 'I hacked up a solitaire game in HTML, CSS and JavaScript with jQuery and (almost) no images.\n \nFor now it follows the simplest Klondike rules: turn one card at a time, with no limit on passes through the deck.',
-    __version__: 0.20,
+    __version__: 0.21,
     __author__: 'Ryan McGreal',
-    __releasedate__: '2011-10-04',
+    __releasedate__: '2011-10-05',
     __homepage__: 'http://quandyfactory.com/projects/74/solitaire',
     __copyright__: '(C) 2011 by Ryan McGreal',
     __licence__: 'GNU General Public Licence, Version 2',
@@ -74,14 +74,19 @@ function startGame(deck) {
 function addTools() {
     // adds restart and redeal buttons
     $('#board').append($('<div id="tools"></div>'));
-    $('#tools').append($('<button id="undo" title="Undo the last move">&lArr; Undo</button>'));
+    
+    $('#tools').append($('<button id="undo" title="Undo the last move">Undo</button>'));
     $('#tools').append($('<button id="restart" title="Start this game over again">Restart</button>'));
-    $('#tools').append($('<button id="redeal" title="Shuffle the deck and start a new game">New Game</button>'));
+    $('#tools').append($('<button id="redeal" title="Shuffle the deck and start a new game">New</button>'));
+    // finish() is not ready yet
+    // $('#tools').append($('<button id="finish" title="Finish off the game (once all the cards are turned up)">Finish</button>'));
     $('#tools').append($('<button id="rules" title="Instructions on how to play the game">Rules</button>'));
     $('#tools').append($('<button id="about" title="About this game">About</button>'));
+    
     $('#undo').click(undo);
     $('#restart').click(restart); 
     $('#redeal').click(redeal); 
+    $('#finish').click(finish);
     $('#about').click(about);
     $('#rules').click(rules);
 }
@@ -269,6 +274,36 @@ function updateMoves(newval) {
     // updates the moves notification
     $('#moves').html('Moves: ' + newval);
     log('moves=' + newval);
+}
+
+function finish() {
+    // moves all the remaining cards up to the foundation
+    // only works if every card is face-up
+    log('in finish()');
+    for (var i = 0; i < Sol.deck.length; i++) {
+        if (Sol.deck[i].face == 'down') {
+            notify('Sorry, but all cards must be face-up to finish the game');
+            log('card ' + Sol.deck[i].id + ' is face-down.');
+            return false;
+        }
+    }
+    
+    // all the cards are face-up. Yay, we can now finish the game.
+    Sol.deck.sort(dynamicSort('valNum'));
+    
+    for (var i = Sol.deck.length-1; i > -1; i--) {
+        log('Finishing ' + printObject(Sol.deck[i]));
+        if (Sol.deck[i].location != 'foundation') {
+            $('#'+Sol.deck[i].id).bind('dblclick', doDoubleClick)
+                .trigger('dblclick');
+        }
+    }
+}
+
+function dynamicSort(property) {
+    return function (a,b) {
+        return (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+    }
 }
 
 function redeal() {
@@ -525,34 +560,37 @@ function makeDblClick(id) {
     
     // now add the handler
     $('#' + id)
-        .dblclick(function() {
-            thisIdNum = parseInt(this.id.replace('card-',''));
-            console.log('dblclick fired on ' + id);
-            var thisTop = 20;
-            var thisLeft = [224, 292, 360, 428];
-            for (i=0;i<thisLeft.length;i++ ) {
-                var elem = document.elementFromPoint(thisLeft[i], thisTop);
-                log('foundation id: ' + elem.id + ', substring: ' + elem.id.substring(0,10));
-                if (elem.id.substring(0,10) == 'foundation' && Sol.deck[thisIdNum].val == 'A') {
-                    log('in makeDblClick(); the ' + Sol.deck[thisIdNum].val + ' of ' + Sol.deck[thisIdNum].suit + ' moves to ' + elem.id + '.');
-                    moveFoundation('ace', this.id, elem.id);
-                    Sol.moves +=1;
-                    updateMoves(Sol.moves);
-                    break;
-                } else { // there's a card on the foundation
-                    var thisElemNum = parseInt(elem.id.replace('card-',''));
-                    log('thisIdNum=' + thisIdNum + ', thisElemNum=' + thisElemNum);
-                    if (thisElemNum && Sol.deck[thisIdNum].suit == Sol.deck[thisElemNum].suit && Sol.deck[thisIdNum].valNum == Sol.deck[thisElemNum].valNum + 1) {
-                        log('in makeDblClick(); the ' + Sol.deck[thisIdNum].val + ' of ' + Sol.deck[thisIdNum].suit + ' moves to ' + elem.id + '.');
-                        moveFoundation('', this.id, elem.id);
-                        Sol.moves +=1;
-                        updateMoves(Sol.moves);
-                        break;
-                }
+        .dblclick(doDoubleClick);
+}
+
+function doDoubleClick() {
+    thisIdNum = parseInt(this.id.replace('card-',''));
+    log('dblclick fired on ' + this.id);
+    var thisTop = 20;
+    var thisLeft = [224, 292, 360, 428];
+    for (i=0;i<thisLeft.length;i++ ) {
+        var elem = document.elementFromPoint(thisLeft[i], thisTop);
+        log('foundation id: ' + elem.id + ', substring: ' + elem.id.substring(0,10));
+        if (elem.id.substring(0,10) == 'foundation' && Sol.deck[thisIdNum].val == 'A') {
+            log('in doDoubleClick(); the ' + Sol.deck[thisIdNum].val + ' of ' + Sol.deck[thisIdNum].suit + ' moves to ' + elem.id + '.');
+            moveFoundation('ace', this.id, elem.id);
+            Sol.moves +=1;
+            updateMoves(Sol.moves);
+            break;
+        } else { // there's a card on the foundation
+            var thisElemNum = parseInt(elem.id.replace('card-',''));
+            log('thisIdNum=' + thisIdNum + ', thisElemNum=' + thisElemNum);
+            if (thisElemNum && Sol.deck[thisIdNum].suit == Sol.deck[thisElemNum].suit && Sol.deck[thisIdNum].valNum == Sol.deck[thisElemNum].valNum + 1) {
+                log('in doDoubleClick(); the ' + Sol.deck[thisIdNum].val + ' of ' + Sol.deck[thisIdNum].suit + ' moves to ' + elem.id + '.');
+                moveFoundation('', this.id, elem.id);
+                Sol.moves +=1;
+                updateMoves(Sol.moves);
+                break;
             }
         }
-    });
+    }
 }
+    
 
 function dragStop() {
     // controls what happens when you stop dragging a card
@@ -825,7 +863,7 @@ function flipCard() {
     
     var thisId = parseInt(this.id.replace('card-', ''));
     
-    console.log('Click fired on ' + thisId);
+    log('Click fired on ' + thisId);
     // make sure there aren't any cards on top of this card
     var elem = document.elementFromPoint(Sol.deck[thisId].posX + 10, Sol.deck[thisId].posY + 30);
     log('this.id = ' + this.id +  ', Sol.deck[thisId].posX + 10=' +  Sol.deck[thisId].posX + 10 + ', Sol.deck[thisId].posY + 30=' +  Sol.deck[thisId].posY + 30 +  ', elem.id=' +  elem.id);
