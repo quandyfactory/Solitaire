@@ -19,7 +19,7 @@ Released under the GNU General Public Licence, Version 2: [http://www.gnu.org/li
 
 ### This Version
 
-* Version: 0.30
+* Version: 0.21
 * Release Date: 2011-10-05
 
 ### Revision History
